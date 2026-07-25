@@ -1,131 +1,125 @@
-import type { User, Item, StringOrNumber, ApiResponse } from "./types/index";
-import type { UserUpdate, UserPreview, PublicUser, RoleCount } from "./types/index";
-import { ClaimStatus, Role } from "./types/index";
+import { useState } from "react";
+import type { User, Item } from "./types/index";
+import ItemCard from "./components/ItemCard";
+import UserCard from "./components/UserCard";
 
 export default function App() {
+  const [claimedItemId, setClaimedItemId] = useState<number | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [claimOwnerId, setClaimOwnerId] = useState<number | null>(null);
 
-// ===== PRIMITIVE TYPE ANNOTATIONS =====
-const projectName: string = "Campus Lost & Found Tracker";
-const currentYear: number = 2026;
-const isActiveTracker: boolean = true;
-const nullValue: null = null;
-const undefinedValue: undefined = undefined;
+  const users: User[] = [
+    {
+      id: 1,
+      name: "Juan dela Cruz",
+      email: "juan@example.com",
+      role: "student",
+      isActive: true,
+    },
+    {
+      id: 2,
+      name: "Maria Santos",
+      email: "maria@example.com",
+      role: "student",
+      isActive: true,
+    },
+    {
+      id: 3,
+      name: "Aldrin Reyes",
+      email: "aldrin@example.com",
+      role: "security_admin",
+      isActive: true,
+    },
+    {
+      id: 4,
+      name: "Liza Gomez",
+      email: "liza@example.com",
+      role: "student",
+      isActive: false,
+    },
+  ];
 
-console.log("Tracker flags:", { isActiveTracker, nullValue, undefinedValue });
+  const items: Item[] = [
+    {
+      id: 101,
+      title: "Blue Hydro Flask Water Bottle",
+      category: "Personal Items",
+      locationFound: "Library 2nd Floor",
+      isResolved: false,
+    },
+    {
+      id: 102,
+      title: "Black Wallet",
+      category: "Personal Items",
+      locationFound: "Cafeteria",
+      isResolved: true,
+    },
+    {
+      id: 103,
+      title: "MacBook Charger",
+      category: "Electronics",
+      locationFound: "Engineering Building",
+      isResolved: false,
+    },
+    {
+      id: 104,
+      title: "Student ID Card",
+      category: "Documents",
+      locationFound: "Security Office",
+      isResolved: true,
+    },
+  ];
 
-function greetTracker(systemName: string, year: number): string {
-  return `Welcome to ${systemName} -- AY ${year}!`;
-}
+  return (
+    <div style={{ maxWidth: "960px", margin: "0 auto", padding: "2rem", fontFamily: "Arial, sans-serif" }}>
+      <h1>Campus Lost &amp; Found Tracker</h1>
+      <p>Manage student reports, claims, and admin profiles in one place.</p>
 
-function logMessage(message: string): void {
-  console.log(message);
-}
+      <section style={{ marginTop: "1.5rem", padding: "1rem", border: "1px solid #ddd", borderRadius: "8px" }}>
+        <h2>Recent Items</h2>
+        <p>
+          {selectedUserId === null
+            ? "Select a user first to file a claim."
+            : claimedItemId !== null
+              ? `Claim filed for item #${claimedItemId} by ${users.find((user) => user.id === claimOwnerId)?.name ?? "Unknown"}.`
+              : "No claim has been filed yet."}
+        </p>
+        <div style={{ display: "grid", gap: "0.75rem" }}>
+          {items.map((item) => (
+            <ItemCard
+              key={item.id}
+              item={item}
+              isClaimed={claimedItemId === item.id}
+              onClaim={() => {
+                if (selectedUserId !== null) {
+                  setClaimedItemId(item.id);
+                  setClaimOwnerId(selectedUserId);
+                }
+              }}
+            />
+          ))}
+        </div>
+      </section>
 
-logMessage(greetTracker(projectName, currentYear));
-
-// ===== USING INTERFACES =====
-const student: User = {
-  id: 1,
-  name: "Juan dela Cruz",
-  email: "juan@example.com",
-  role: "student",
-  isActive: true,
-};
-
-const lostItem: Item = {
-  id: 101,
-  title: "Blue Hydro Flask Water Bottle",
-  category: "Personal Items",
-  locationFound: "Library 2nd Floor",
-  isResolved: false,
-};
-
-console.log("Registered User:", student);
-console.log("Logged Lost Item:", lostItem);
-
-// ===== TYPE NARROWING =====
-function processInput(input: StringOrNumber): string {
-  if (typeof input === "string") {
-    return input.toUpperCase();
-  }
-  return input.toFixed(2);
-}
-
-function formatDate(value: string | Date): string {
-  if (value instanceof Date) {
-    return value.toLocaleDateString();
-  }
-  return value;
-}
-
-console.log("Narrowed String (Category):", processInput("electronics"));
-console.log("Narrowed Number (Item ID):", processInput(101.456));
-console.log("Narrowed Date (Claim Date):", formatDate(new Date()));
-
-// ===== GENERIC FUNCTIONS =====
-function getFirst<T>(items: T[]): T | undefined {
-  return items[0];
-}
-
-function getById<T extends { id: number }>(items: T[], id: number): T | undefined {
-  return items.find((item) => item.id === id);
-}
-
-const firstItem = getFirst<Item>([lostItem]);
-const foundItem = getById<Item>([lostItem], 101);
-
-console.log("First Item Title:", firstItem?.title);
-console.log("Found Item Location:", foundItem?.locationFound);
-
-// ===== GENERIC INTERFACE =====
-const userResponse: ApiResponse<User> = {
-  success: true,
-  data: student,
-};
-
-const itemResponse: ApiResponse<Item[]> = {
-  success: true,
-  data: [lostItem],
-};
-
-console.log("API Response User Name:", userResponse.data.name);
-console.log("API Response Item Count:", itemResponse.data.length);
-
-// ===== USING UTILITY TYPES =====
-const patch: UserUpdate = { name: "Juan D. Cruz" };
-const preview: UserPreview = { id: 1, name: "Juan dela Cruz", role: "student" };
-const publicProfile: PublicUser = { id: 1, name: "Juan dela Cruz", role: "student" };
-const roleCount: RoleCount = { student: 120, security_admin: 4 };
-
-console.log("User Patch Payload:", patch);
-console.log("User Preview:", preview);
-console.log("Public User Profile:", publicProfile);
-console.log("Role Counts:", roleCount);
-
-// ===== ReturnType<T> =====
-function createClaim(itemId: number, claimedByUserId: number) {
-  return {
-    id: 1,
-    itemId,
-    claimedByUserId,
-    claimedAt: new Date(),
-    notes: "Identified distinct sticker on bottle base",
-  };
-}
-
-type NewClaim = ReturnType<typeof createClaim>;
-const userClaim: NewClaim = createClaim(101, 1);
-console.log("Inferred New Claim:", userClaim);
-
-// ===== USING ENUMS =====
-let currentClaimStatus: ClaimStatus = ClaimStatus.Pending;
-console.log("Current Claim Status:", currentClaimStatus);
-
-currentClaimStatus = ClaimStatus.Verified;
-console.log("Is Claim Verified?:", currentClaimStatus === ClaimStatus.Verified);
-
-const currentRole: Role = Role.Student;
-console.log("Role Value:", currentRole);
-
-  return null;
+      <section style={{ marginTop: "1.5rem", padding: "1rem", border: "1px solid #ddd", borderRadius: "8px" }}>
+        <h2>Active Users</h2>
+        <p>
+          {selectedUserId !== null
+            ? `Selected profile: ${users.find((user) => user.id === selectedUserId)?.name ?? "Unknown"}`
+            : "No profile selected yet."}
+        </p>
+        <div style={{ display: "grid", gap: "0.75rem" }}>
+          {users.map((user) => (
+            <UserCard
+              key={user.id}
+              user={user}
+              isSelected={selectedUserId === user.id}
+              onSelect={() => setSelectedUserId(user.id)}
+              onClear={() => setSelectedUserId(null)}
+            />
+          ))}
+        </div>
+      </section>
+    </div>
+  );
 }
