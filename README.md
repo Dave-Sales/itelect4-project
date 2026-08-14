@@ -1,3 +1,36 @@
+# Campus Lost & Found — Routing & Auth
+
+Quick notes and commands to run the app and verify the new routing/auth features.
+
+**Prerequisites:** Node.js + npm installed.
+
+- **Install deps:**
+
+```bash
+npm install
+```
+
+- **Start dev server:**
+
+```bash
+npm run dev
+```
+
+- Open the app at: `http://localhost:5173/`
+
+**What was added**
+- `src/pages/` — `Home`, `About`, `Login`, `ItemDetail`, `NotFound`
+- `src/components/Layout.tsx` — shared nav + `Outlet`
+- `src/components/ProtectedRoute.tsx` — redirects to `/login` when not authenticated
+- `src/stores/auth.ts` — typed Zustand auth store (`token`, `login`, `logout`)
+
+**Manual verification (ProtectedRoute)**
+1. Start the dev server.
+2. Visit `http://localhost:5173/items/101` in your browser — you should be redirected to `/login`.
+3. On the `/login` page enter a name and submit — this sets a fake token.
+4. After login, navigate to `/items/101` — you should now see the Item Detail view showing the ID.
+
+If you want an automated end-to-end test, I can add a Playwright or Puppeteer test and a `test:e2e` script — tell me which you prefer.
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
