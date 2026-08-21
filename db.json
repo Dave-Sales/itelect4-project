@@ -1,0 +1,15 @@
+{
+  "users": [
+    { "id": 1, "name": "Juan dela Cruz", "email": "juan@example.com", "role": "student", "isActive": true },
+    { "id": 2, "name": "Maria Santos", "email": "maria@example.com", "role": "student", "isActive": true },
+    { "id": 3, "name": "Aldrin Reyes", "email": "aldrin@example.com", "role": "security_admin", "isActive": true },
+    { "id": 4, "name": "Liza Gomez", "email": "liza@example.com", "role": "student", "isActive": false }
+  ],
+  "items": [
+    { "id": 101, "title": "Blue Hydro Flask Water Bottle", "category": "Personal Items", "locationFound": "Library 2nd Floor", "isResolved": false },
+    { "id": 102, "title": "Black Wallet", "category": "Personal Items", "locationFound": "Cafeteria", "isResolved": true },
+    { "id": 103, "title": "MacBook Charger", "category": "Electronics", "locationFound": "Engineering Building", "isResolved": false },
+    { "id": 104, "title": "Student ID Card", "category": "Documents", "locationFound": "Security Office", "isResolved": true }
+  ],
+  "claims": []
+}

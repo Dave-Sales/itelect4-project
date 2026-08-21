@@ -1,4 +1,5 @@
-import create from "zustand";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 type UserInfo = { name?: string } | null;
 
@@ -9,9 +10,14 @@ type AuthState = {
   logout: () => void;
 };
 
-export const useAuthStore = create<AuthState>((set) => ({
-  token: null,
-  user: null,
-  login: (token, user = null) => set({ token, user }),
-  logout: () => set({ token: null, user: null }),
-}));
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      token: null,
+      user: null,
+      login: (token, user = null) => set({ token, user }),
+      logout: () => set({ token: null, user: null }),
+    }),
+    { name: "lostfound-auth" }
+  )
+);
