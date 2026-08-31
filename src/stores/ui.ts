@@ -3,9 +3,11 @@ import { persist } from "zustand/middleware";
 
 interface UiState {
   selectedUserId: number | null;
+  selectedItemId: number | null;
   searchTerm: string;
   darkMode: boolean;
   setSelectedUserId: (id: number | null) => void;
+  setSelectedItemId: (id: number | null) => void;
   clearSelection: () => void;
   setSearchTerm: (term: string) => void;
   toggleDarkMode: () => void;
@@ -23,10 +25,12 @@ export const useUiStore = create<UiState>()(
   persist(
     (set) => ({
       selectedUserId: null,
+      selectedItemId: null,
       searchTerm: "",
       darkMode: getInitialDarkMode(),
       setSelectedUserId: (id) => set({ selectedUserId: id }),
-      clearSelection: () => set({ selectedUserId: null }),
+      setSelectedItemId: (id) => set({ selectedItemId: id }),
+      clearSelection: () => set({ selectedUserId: null, selectedItemId: null }),
       setSearchTerm: (term) => set({ searchTerm: term }),
       toggleDarkMode: () => set((state) => ({ darkMode: !state.darkMode })),
     }),

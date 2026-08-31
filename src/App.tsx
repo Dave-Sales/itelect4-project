@@ -13,7 +13,14 @@ import { useUiStore } from "./stores/ui";
 
 export default function App() {
   const queryClient = useQueryClient();
-  const { searchTerm, setSearchTerm, darkMode, toggleDarkMode } = useUiStore();
+  const {
+    searchTerm,
+    setSearchTerm,
+    darkMode,
+    toggleDarkMode,
+    selectedUserId,
+    selectedItemId,
+  } = useUiStore();
 
   const { data: users = [], isLoading: usersLoading, error: usersError } = useQuery({
     queryKey: ["users"],
@@ -28,6 +35,37 @@ export default function App() {
   const { data: claims = [] } = useQuery({
     queryKey: ["claims"],
     queryFn: fetchClaims,
+  });
+
+  const normalizedSearchTerm = searchTerm.trim().toLowerCase();
+
+  const filteredUsers = users.filter((user) => {
+    if (!normalizedSearchTerm) return true;
+
+    return [user.name, user.email, user.role].some((value) =>
+      value.toLowerCase().includes(normalizedSearchTerm)
+    );
+  });
+
+  const filteredItems = items.filter((item) => {
+    if (!normalizedSearchTerm) return true;
+
+    return [item.title, item.category, item.locationFound].some((value) =>
+      value.toLowerCase().includes(normalizedSearchTerm)
+    );
+  });
+
+  const filteredClaims = claims.filter((claim) => {
+    if (!normalizedSearchTerm) return true;
+
+    const user = users.find((entry) => entry.id === claim.claimedByUserId);
+    const item = items.find((entry) => entry.id === claim.itemId);
+
+    return [
+      user?.name ?? "",
+      item?.title ?? "",
+      claim.notes ?? "",
+    ].some((value) => value.toLowerCase().includes(normalizedSearchTerm));
   });
 
   const createClaimMutation = useMutation({
@@ -48,16 +86,13 @@ export default function App() {
   };
 
   const handleCreateClaim = () => {
-    if (users.length === 0 || items.length === 0) {
+    if (selectedUserId === null || selectedItemId === null) {
       return;
     }
 
-    const demoUser = users[0];
-    const demoItem = items[0];
-
     createClaimMutation.mutate({
-      itemId: demoItem.id,
-      claimedByUserId: demoUser.id,
+      itemId: selectedItemId,
+      claimedByUserId: selectedUserId,
       notes: "Demo claim created through the API layer.",
     });
   };
@@ -73,9 +108,10 @@ export default function App() {
             isDarkMode={darkMode}
             onToggleDarkMode={toggleDarkMode}
             onCreateClaim={handleCreateClaim}
-            claims={claims}
-            items={items}
-            users={users}
+            isCreateClaimDisabled={selectedUserId === null || selectedItemId === null}
+            claims={filteredClaims}
+            items={filteredItems}
+            users={filteredUsers}
             isLoading={usersLoading || itemsLoading}
             hasError={Boolean(usersError || itemsError)}
             errorMessage={
