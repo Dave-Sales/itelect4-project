@@ -9,10 +9,12 @@ import ItemDetail from "./pages/ItemDetail";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { createClaim, fetchClaims, fetchItems, fetchUsers, type ClaimInput } from "./lib/api";
+import { useAuthStore } from "./stores/auth";
 import { useUiStore } from "./stores/ui";
 
 export default function App() {
   const queryClient = useQueryClient();
+  const token = useAuthStore((s) => s.token);
   const {
     searchTerm,
     setSearchTerm,
@@ -23,18 +25,21 @@ export default function App() {
   } = useUiStore();
 
   const { data: users = [], isLoading: usersLoading, error: usersError } = useQuery({
-    queryKey: ["users"],
+    queryKey: ["users", token],
     queryFn: fetchUsers,
+    enabled: Boolean(token),
   });
 
   const { data: items = [], isLoading: itemsLoading, error: itemsError } = useQuery({
-    queryKey: ["items"],
+    queryKey: ["items", token],
     queryFn: fetchItems,
+    enabled: Boolean(token),
   });
 
   const { data: claims = [] } = useQuery({
-    queryKey: ["claims"],
+    queryKey: ["claims", token],
     queryFn: fetchClaims,
+    enabled: Boolean(token),
   });
 
   const normalizedSearchTerm = searchTerm.trim().toLowerCase();
