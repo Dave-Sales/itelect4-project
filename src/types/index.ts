@@ -2,15 +2,17 @@
 
 // ===== CORE ENTITIES =====
 export interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
-  role: "student" | "security_admin";
+  role: UserRole;
   isActive: boolean;
 }
 
+export type UserRole = "student" | "security_admin";
+
 export interface Item {
-  id: number;
+  id: string;
   title: string;
   category: string;
   locationFound: string;
@@ -18,11 +20,24 @@ export interface Item {
 }
 
 export interface Claim {
-  id: number;
-  itemId: number;
-  claimedByUserId: number;
+  id: string;
+  itemId: string;
+  claimedByUserId: string;
   claimedAt: Date;
   notes?: string;
+}
+
+export interface Category {
+  id: string;
+  slug: string;
+  name: string;
+}
+
+export interface AiReview {
+  summary: string;
+  strengths: string[];
+  improvements: string[];
+  readiness: "ready" | "almost" | "not-yet";
 }
 
 // ===== TYPE ALIASES & UNIONS =====

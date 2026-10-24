@@ -5,10 +5,19 @@ import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ReviewPage from "./pages/ReviewPage";
 import ItemDetail from "./pages/ItemDetail";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { createClaim, fetchClaims, fetchItems, fetchUsers, type ClaimInput } from "./lib/api";
+import {
+  createClaim,
+  fetchCategories,
+  fetchClaims,
+  fetchItems,
+  fetchUsers,
+  type ClaimInput,
+} from "./api/client";
 import { useAuthStore } from "./stores/auth";
 import { useUiStore } from "./stores/ui";
 
@@ -22,7 +31,17 @@ export default function App() {
     toggleDarkMode,
     selectedUserId,
     selectedItemId,
+    selectedCategory,
+    setSelectedCategory,
   } = useUiStore();
+
+  const {
+    data: categories = [],
+    error: categoriesError,
+  } = useQuery({
+    queryKey: ["categories"],
+    queryFn: fetchCategories,
+  });
 
   const { data: users = [], isLoading: usersLoading, error: usersError } = useQuery({
     queryKey: ["users", token],
@@ -53,6 +72,7 @@ export default function App() {
   });
 
   const filteredItems = items.filter((item) => {
+    if (selectedCategory && item.category !== selectedCategory) return false;
     if (!normalizedSearchTerm) return true;
 
     return [item.title, item.category, item.locationFound].some((value) =>
@@ -110,6 +130,9 @@ export default function App() {
           <Layout
             searchTerm={searchTerm}
             onSearchChange={handleSearchChange}
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
             isDarkMode={darkMode}
             onToggleDarkMode={toggleDarkMode}
             onCreateClaim={handleCreateClaim}
@@ -118,13 +141,15 @@ export default function App() {
             items={filteredItems}
             users={filteredUsers}
             isLoading={usersLoading || itemsLoading}
-            hasError={Boolean(usersError || itemsError)}
+            hasError={Boolean(usersError || itemsError || categoriesError)}
             errorMessage={
               usersError instanceof Error
                 ? usersError.message
                 : itemsError instanceof Error
                   ? itemsError.message
-                  : "Unexpected loading error."
+                  : categoriesError instanceof Error
+                    ? categoriesError.message
+                    : "Unexpected loading error."
             }
           />
         }
@@ -132,6 +157,15 @@ export default function App() {
         <Route index element={<Home />} />
         <Route path="about" element={<About />} />
         <Route path="login" element={<Login />} />
+        <Route path="register" element={<Register />} />
+        <Route
+          path="review"
+          element={
+            <ProtectedRoute>
+              <ReviewPage />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="items/:itemId"
           element={<ProtectedRoute><ItemDetail /></ProtectedRoute>}

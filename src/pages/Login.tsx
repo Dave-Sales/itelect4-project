@@ -1,16 +1,16 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { loginUser } from "../lib/api";
+import { loginUser } from "../api/client";
 import { useAuthStore } from "../stores/auth";
 
 const loginSchema = z.object({
   email: z.string().trim().email("Please enter a valid email."),
-  password: z.string().min(6, "Password must be at least 6 characters."),
+  password: z.string().min(8, "Password must be at least 8 characters."),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -96,6 +96,9 @@ export default function Login() {
           {isSubmitting ? "Logging in..." : "Login"}
         </Button>
       </form>
+      <p className="mt-4 text-sm">
+        Need an account? <Link to="/register" className="text-brand-600">Register</Link>
+      </p>
     </div>
   );
 }
