@@ -3,11 +3,14 @@ import { Link, Outlet } from "react-router-dom";
 import ItemCard from "./ItemCard";
 import UserCard from "./UserCard";
 import { useUiStore } from "../stores/ui";
-import type { Claim, Item, User } from "../types/index";
+import type { Category, Claim, Item, User } from "../types/index";
 
 interface LayoutProps {
   searchTerm: string;
   onSearchChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  categories: Category[];
+  selectedCategory: string;
+  onCategoryChange: (category: string) => void;
   isDarkMode: boolean;
   onToggleDarkMode: () => void;
   onCreateClaim?: () => void;
@@ -24,6 +27,9 @@ interface LayoutProps {
 export default function Layout({
   searchTerm,
   onSearchChange,
+  categories,
+  selectedCategory,
+  onCategoryChange,
   isDarkMode,
   onToggleDarkMode,
   onCreateClaim,
@@ -45,6 +51,8 @@ export default function Layout({
           <Link to="/" className="font-semibold">Lost & Found</Link>
           <Link to="/about" className="text-sm text-slate-600 dark:text-slate-300">About</Link>
           <Link to="/login" className="ml-auto text-sm text-brand-600">Login</Link>
+          <Link to="/register" className="text-sm text-brand-600">Register</Link>
+          <Link to="/review" className="text-sm text-brand-600">AI Review</Link>
           <button
             type="button"
             onClick={onToggleDarkMode}
@@ -74,6 +82,19 @@ export default function Layout({
               placeholder="Search items and users"
               className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-sm outline-none ring-0 transition focus:border-brand-500 dark:border-slate-700 dark:bg-slate-950"
             />
+            <select
+              value={selectedCategory}
+              onChange={(event) => onCategoryChange(event.target.value)}
+              aria-label="Filter by category"
+              className="rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-950"
+            >
+              <option value="">All categories</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.name}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
             {onCreateClaim ? (
               <button
                 type="button"
