@@ -1,5 +1,7 @@
 # Campus Lost & Found
 
+[![CI](https://github.com/Dave-Sales/itelect4-project/actions/workflows/ci.yml/badge.svg)](https://github.com/Dave-Sales/itelect4-project/actions/workflows/ci.yml)
+
 ## Local development
 
 1. Install dependencies with `npm install`.
